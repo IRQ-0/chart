@@ -33,6 +33,8 @@ typedef enum {
 
 #define REVERSE 1
 
+#define SCALE_DATA 1
+
 typedef struct {
 	char* fileName;
 	int fileSize;

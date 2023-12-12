@@ -243,6 +243,16 @@ int writePixelsMap(headerInfo header, pixelsMap map) {
 
 // Chart
 
+int bytesToInt(unsigned char* bytes) {
+	int x;
+	memcpy(&x, bytes, CHART_ELEMENT_SIZE);
+	return x;
+}
+
+void intToBytes(int num, unsigned char* bytes) {
+	memcpy(bytes, &num, CHART_ELEMENT_SIZE);
+}
+
 int makeChart(char* filename, chartInfo* chart, headerInfo info, pixelsMap map) {
 	chart->map = map;
 	chart->fileName = filename;
@@ -274,17 +284,37 @@ int makeChart(char* filename, chartInfo* chart, headerInfo info, pixelsMap map) 
 		return FREAD_ERROR;
 	}
 
-	chart->rawData = out;
+	#ifdef SCALE_DATA
+
+		int max = 0;
+
+		for (int i = 0; i < size; i += CHART_ELEMENT_SIZE) {
+			if (bytesToInt(out + i) > max) {
+				max = bytesToInt(out + i);
+			}
+		}
+
+		chartData outFinal = (chartData) malloc(size);
+		if (!outFinal) {
+			return MALLOC_ERROR;
+		}
+
+		for (int i = 0; i < size; i += CHART_ELEMENT_SIZE) {
+			intToBytes(((info.height * bytesToInt(out + i)) / max), (outFinal + i));
+		}
+
+		chart->rawData = outFinal;
+		free(out);
+
+	#else
+
+		chart->rawData = out;
+
+	#endif
 
 	fclose(f);
 
 	return 0;
-}
-
-int bytesToInt(unsigned char* bytes) {
-	int x;
-	memcpy(&x, bytes, CHART_ELEMENT_SIZE);
-	return x;	
 }
 
 void verticalLine(pixelsMap map, int y0, int y1, int x, color col, headerInfo info) {
