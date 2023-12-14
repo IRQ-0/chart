@@ -362,7 +362,7 @@ void drawFlowChartRGB(chartInfo chrt, unsigned char r, unsigned char g, unsigned
 void drawDotChart(chartInfo chrt, color col) {
 	unsigned char buffer[CHART_ELEMENT_SIZE];
 
-	for (int i = 0; i < (chrt.fileSize / CHART_ELEMENT_SIZE); i++) {
+	for (int i = 0; i < ((chrt.fileSize / CHART_ELEMENT_SIZE) - 1); i++) {
 		memcpy(buffer, (chrt.rawData + (i * CHART_ELEMENT_SIZE)), CHART_ELEMENT_SIZE);
 		putPixel(chrt.map, i, (chrt.headerInfo.height - bytesToInt(buffer)), chrt.headerInfo, col);
 	}
@@ -371,7 +371,7 @@ void drawDotChart(chartInfo chrt, color col) {
 void drawDotChartRGB(chartInfo chrt, unsigned char r, unsigned char g, unsigned char b) {
 	unsigned char buffer[CHART_ELEMENT_SIZE];
 
-	for (int i = 0; i < (chrt.fileSize / CHART_ELEMENT_SIZE); i++) {
+	for (int i = 0; i < ((chrt.fileSize / CHART_ELEMENT_SIZE) - 1); i++) {
 		memcpy(buffer, (chrt.rawData + (i * CHART_ELEMENT_SIZE)), CHART_ELEMENT_SIZE);
 		putPixelRGB(chrt.map, i, (chrt.headerInfo.height - bytesToInt(buffer)), chrt.headerInfo, r, g, b);
 	}

@@ -3,36 +3,260 @@
 #include <time.h>
 #include "chart.h"
 
+#define FLOW 1
+#define DOT  2
+#define BAR  3
+
 int main(int argc, char** argv) {
 	headerInfo header;
-	header.fileName = "asdf.bmp";
-	header.fileSize = getFileSize(1000, 1000, BITS_PER_PIXEL);
-	header.width = 1000;
-	header.height = 1000;
 
-	printf("%d\n", writeHeader(header));
+	if (argc < 8) {
+		puts("usage: chart <filename in> <filename out> <width> <height> <background> <chart type> [options] <chart color> [dividion nets] [options] [division net color]");
+		puts("\nAvailable backgrounds:\n - black \n - green \n - red \n - blue \n - white");
+		puts("\n\nAvailable charts:\n - flow (no options needed) \n - dot (no options needed) \n - bar <bar count> <bar space> <bar width>");
+		puts("\nAvailable chart colors:\n - black \n - green \n - red \n - blue \n - white");
+		puts("\nDivision nets and lines:\n - net <net count> <net space> <net width> \n - lines <lines count> <lines space> <lines width> <lines type> type: horizontal / vertical");
+
+		return 2;
+	}
+
+	if (atoi(argv[3]) <= 0) {
+		puts("Invalid width");
+
+		return 1;
+	}
+
+	if (atoi(argv[4]) <= 0) {
+		puts("Invalid height");
+
+		return 1;
+	}
+
+	header.fileName = argv[2];
+	puts(header.fileName);
+	header.fileSize = getFileSize(atoi(argv[3]), atoi(argv[4]), BITS_PER_PIXEL);
+	header.width = atoi(argv[3]);
+	header.height = atoi(argv[4]);
+
+	int err = writeHeader(header);
+
+	if (err != 0) {
+		printf("Header error: %d\n", err);
+
+		return 1;
+	}
 
 	pixelsMap map;
 	map = allocatePixelsMap(header);
 
-	fillBackground(map, header, BLACK);
+	if (strcmp(argv[5], "black") == 0) {
+		fillBackground(map, header, BLACK);
+
+	} else if (strcmp(argv[5], "green") == 0) {
+		fillBackground(map, header, GREEN);
+
+	} else if (strcmp(argv[5], "red") == 0) {
+		fillBackground(map, header, RED);
+
+	} else if (strcmp(argv[5], "blue") == 0) {
+		fillBackground(map, header, BLUE);
+
+	} else if (strcmp(argv[5], "white") == 0) {
+		fillBackground(map, header, WHITE);
+
+	} else {
+		puts("Unrecognized predfifined background");
+
+		return 1;
+	}
 
 	chartInfo chr;
 
-	printf("%d\n", makeChart("out.a", &chr, header, map));
+	err = makeChart(argv[1], &chr, header, map);
 
-	//addDivisionNetRGB(chr, 50, 20, 1, 25, 255, 20);
+	if (err != 0) {
+		printf("Chart error %d\n", err);
 
-	//drawBarChart(chr, 8, 20, 10, BLACK);
-	drawFlowChartRGB(chr, 25, 255, 20);
-	//addDivisionNet(chr, 2, 500, 1, BLACK);
+		return 1;
+	}
 
-	//addDivisionLines(chr, 5, 100, 5, VERTICAL, BLACK);
-	//addDivisionLines(chr, 5, 100, 5, HORIZONTAL, BLACK);
+	int chartType = 0, chartColor = 0, valueOffset = 0;
 
-//	verticalLine(map, 0, 500, 500, BLACK, header);
+	if (strcmp(argv[6], "flow") == 0) {
+		chartType = FLOW;
+		valueOffset = 7;
 
-	printf("%d\n", writePixelsMap(header, map));
+	} else if (strcmp(argv[6], "dot") == 0) {
+		chartType = DOT;
+		valueOffset = 7;
+
+	} else if (strcmp(argv[6], "bar") == 0) {
+		if (argc == 7) {
+			puts("Not enough parameters");
+
+			return 2;
+		}
+
+		chartType = BAR;
+		valueOffset = 10;
+
+	} else {
+		puts("Unrecognized chart type");
+
+		return 1;
+	}
+
+
+	if (strcmp(argv[valueOffset], "black") == 0) {
+		chartColor = BLACK;
+
+	} else if (strcmp(argv[valueOffset], "green") == 0) {
+		chartColor = GREEN;
+
+	} else if (strcmp(argv[valueOffset], "red") == 0) {
+		chartColor = RED;
+
+	} else if (strcmp(argv[valueOffset], "blue") == 0) {
+		chartColor = BLUE;
+
+	} else if (strcmp(argv[valueOffset], "white") == 0) {
+		chartColor = WHITE;
+
+	} else {
+		puts("Unrecognized predfifined chart color");
+
+		return 1;
+	}
+
+	switch (chartType) {
+
+	case FLOW:
+		drawFlowChart(chr, chartColor);
+
+		break;
+
+	case DOT:
+		drawDotChart(chr, chartColor);
+
+		break;
+
+	case BAR:
+		if (atoi(argv[7]) <= 0 || atoi(argv[8]) <= 0 || atoi(argv[9]) <= 0) {
+			puts("Invalid chart parameters");
+
+			return 1;
+		}
+
+		drawBarChart(chr, atoi(argv[7]), atoi(argv[8]), atoi(argv[9]), chartColor);
+
+		break;
+	}
+
+	if ((valueOffset + 1) == argc) {
+		
+	} else {
+		if (strcmp(argv[11], "net") == 0) {
+
+			if (argc != 16) {
+				puts("Not enough parameters");
+
+				return 2;
+			}
+
+			if (atoi(argv[12]) <= 0 || atoi(argv[13]) <= 0 || atoi(argv[14]) <= 0) {
+				puts("Invalid net parameters");
+
+				return 1;
+			}
+
+			int netColor = 0;
+
+			if (strcmp(argv[15], "black") == 0) {
+				netColor = BLACK;
+
+			} else if (strcmp(argv[15], "green") == 0) {
+				netColor = GREEN;
+
+			} else if (strcmp(argv[15], "red") == 0) {
+				netColor = RED;
+
+			} else if (strcmp(argv[15], "blue") == 0) {
+				netColor = BLUE;
+
+			} else if (strcmp(argv[15], "white") == 0) {
+				netColor = WHITE;
+
+			} else {
+				puts("Unrecognized predfifined chart color");
+
+				return 1;
+			}
+
+			addDivisionNet(chr, atoi(argv[12]), atoi(argv[13]), atoi(argv[14]), netColor);
+
+		} else if (strcmp(argv[11], "lines") == 0) {
+			if (argc != 17) {
+				puts("Not enough parameters");
+
+				return 2;
+			}
+
+			if (atoi(argv[12]) <= 0 || atoi(argv[13]) <= 0 || atoi(argv[14]) <= 0) {
+				puts("Invalid net parameters");
+
+				return 1;
+			}
+
+			int lineType = 0;
+
+			if (strcmp(argv[15], "horizontal") == 0) {
+				lineType = HORIZONTAL;
+
+			} else if (strcmp(argv[15], "vertical") == 0) {
+				lineType = VERTICAL;
+
+			} else {
+				puts("Unrecognized lines type");
+
+				return 1;
+			}
+
+			int lineColor = 0;
+
+			if (strcmp(argv[16], "black") == 0) {
+				lineColor = BLACK;
+
+			} else if (strcmp(argv[16], "green") == 0) {
+				lineColor = GREEN;
+
+			} else if (strcmp(argv[16], "red") == 0) {
+				lineColor = RED;
+
+			} else if (strcmp(argv[16], "blue") == 0) {
+				lineColor = BLUE;
+
+			} else if (strcmp(argv[16], "white") == 0) {
+				lineColor = WHITE;
+
+			} else {
+				puts("Unrecognized predfifined chart color");
+
+				return 1;
+			}
+
+			addDivisionLines(chr, atoi(argv[12]), atoi(argv[13]), atoi(argv[14]), lineType, lineColor);
+		}
+	}
+
+
+
+	err = writePixelsMap(header, map);
+
+	if (err != 0) {
+		printf("Writing error: %d\n", err);
+
+		return 1;
+	}
 
 	return 0;
 }

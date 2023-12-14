@@ -74,6 +74,7 @@ void horizontalLineRGB(pixelsMap, int, int, int, unsigned char, unsigned char, u
 
 int makeChart(char*, chartInfo*, headerInfo, pixelsMap);
 int bytesToInt(unsigned char*);
+void intToBytes(int, unsigned char*);
 
 void drawFlowChart(chartInfo, color);
 void drawFlowChartRGB(chartInfo, unsigned char, unsigned char, unsigned char);
