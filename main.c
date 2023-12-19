@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 #include "chart.h"
 
 #define FLOW 1
@@ -20,6 +21,14 @@ int main(int argc, char** argv) {
 		return 2;
 	}
 
+	char buf;
+	for (int i = 3; i < argc; i++) {
+		for (int j = 0; j < strlen(argv[i]); j++) {
+			buf = *(argv[i] + j);
+			*(argv[i] + j) = tolower(buf);
+		}
+	}
+
 	if (atoi(argv[3]) <= 0) {
 		puts("Invalid width");
 
@@ -33,7 +42,6 @@ int main(int argc, char** argv) {
 	}
 
 	header.fileName = argv[2];
-	puts(header.fileName);
 	header.fileSize = getFileSize(atoi(argv[3]), atoi(argv[4]), BITS_PER_PIXEL);
 	header.width = atoi(argv[3]);
 	header.height = atoi(argv[4]);
@@ -152,18 +160,21 @@ int main(int argc, char** argv) {
 		break;
 	}
 
-	if ((valueOffset + 1) == argc) {
-		
-	} else {
-		if (strcmp(argv[11], "net") == 0) {
+	valueOffset++;
 
-			if (argc != 16) {
+	printf("argc: %d  valueOffset: %d\n", argc, valueOffset);
+	if (argc != valueOffset) {
+		
+
+		if (strcmp(argv[valueOffset], "net") == 0) {
+
+			if (argc != (valueOffset + 5)) {
 				puts("Not enough parameters");
 
 				return 2;
 			}
 
-			if (atoi(argv[12]) <= 0 || atoi(argv[13]) <= 0 || atoi(argv[14]) <= 0) {
+			if (atoi(argv[valueOffset + 1]) <= 0 || atoi(argv[valueOffset + 2]) <= 0 || atoi(argv[valueOffset + 3]) <= 0) {
 				puts("Invalid net parameters");
 
 				return 1;
@@ -171,19 +182,19 @@ int main(int argc, char** argv) {
 
 			int netColor = 0;
 
-			if (strcmp(argv[15], "black") == 0) {
+			if (strcmp(argv[valueOffset + 4], "black") == 0) {
 				netColor = BLACK;
 
-			} else if (strcmp(argv[15], "green") == 0) {
+			} else if (strcmp(argv[valueOffset + 4], "green") == 0) {
 				netColor = GREEN;
 
-			} else if (strcmp(argv[15], "red") == 0) {
+			} else if (strcmp(argv[valueOffset + 4], "red") == 0) {
 				netColor = RED;
 
-			} else if (strcmp(argv[15], "blue") == 0) {
+			} else if (strcmp(argv[valueOffset + 4], "blue") == 0) {
 				netColor = BLUE;
 
-			} else if (strcmp(argv[15], "white") == 0) {
+			} else if (strcmp(argv[valueOffset + 4], "white") == 0) {
 				netColor = WHITE;
 
 			} else {
@@ -192,16 +203,16 @@ int main(int argc, char** argv) {
 				return 1;
 			}
 
-			addDivisionNet(chr, atoi(argv[12]), atoi(argv[13]), atoi(argv[14]), netColor);
+			addDivisionNet(chr, atoi(argv[valueOffset + 1]), atoi(argv[valueOffset + 2]), atoi(argv[valueOffset + 3]), netColor);
 
-		} else if (strcmp(argv[11], "lines") == 0) {
-			if (argc != 17) {
+		} else if (strcmp(argv[valueOffset], "lines") == 0) {
+			if (argc != (valueOffset + 6)) {
 				puts("Not enough parameters");
 
 				return 2;
 			}
 
-			if (atoi(argv[12]) <= 0 || atoi(argv[13]) <= 0 || atoi(argv[14]) <= 0) {
+			if (atoi(argv[valueOffset + 1]) <= 0 || atoi(argv[valueOffset + 2]) <= 0 || atoi(argv[valueOffset + 3]) <= 0) {
 				puts("Invalid net parameters");
 
 				return 1;
@@ -209,10 +220,10 @@ int main(int argc, char** argv) {
 
 			int lineType = 0;
 
-			if (strcmp(argv[15], "horizontal") == 0) {
+			if (strcmp(argv[valueOffset + 4], "horizontal") == 0) {
 				lineType = HORIZONTAL;
 
-			} else if (strcmp(argv[15], "vertical") == 0) {
+			} else if (strcmp(argv[valueOffset + 4], "vertical") == 0) {
 				lineType = VERTICAL;
 
 			} else {
@@ -223,19 +234,19 @@ int main(int argc, char** argv) {
 
 			int lineColor = 0;
 
-			if (strcmp(argv[16], "black") == 0) {
+			if (strcmp(argv[valueOffset + 5], "black") == 0) {
 				lineColor = BLACK;
 
-			} else if (strcmp(argv[16], "green") == 0) {
+			} else if (strcmp(argv[valueOffset + 5], "green") == 0) {
 				lineColor = GREEN;
 
-			} else if (strcmp(argv[16], "red") == 0) {
+			} else if (strcmp(argv[valueOffset + 5], "red") == 0) {
 				lineColor = RED;
 
-			} else if (strcmp(argv[16], "blue") == 0) {
+			} else if (strcmp(argv[valueOffset + 5], "blue") == 0) {
 				lineColor = BLUE;
 
-			} else if (strcmp(argv[16], "white") == 0) {
+			} else if (strcmp(argv[valueOffset + 5], "white") == 0) {
 				lineColor = WHITE;
 
 			} else {
@@ -244,11 +255,9 @@ int main(int argc, char** argv) {
 				return 1;
 			}
 
-			addDivisionLines(chr, atoi(argv[12]), atoi(argv[13]), atoi(argv[14]), lineType, lineColor);
+			addDivisionLines(chr, atoi(argv[valueOffset + 1]), atoi(argv[valueOffset + 2]), atoi(argv[valueOffset + 3]), lineType, lineColor);
 		}
 	}
-
-
 
 	err = writePixelsMap(header, map);
 
