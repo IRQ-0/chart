@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "mainwnd.h"
 
-HWND hMainWnd, hInputFilename, hOutputFilename, hWidth, hHeight, hChartBackground, hChartColor, hChartType, hBarCount, hBarSpace, hBarWidth, hNetType, hNetColor, hNetCount, hNetSpace, hNetWidth, hLineType, hGenerate;
+HWND hMainWnd, hInputFilename, hOutputFilename, hWidth, hHeight, hChartBackground, hChartColor, hChartType, hBarCount, hBarSpace, hBarWidth, hNetType, hNetColor, hNetCount, hNetSpace, hNetWidth, hLineType, hGenerate, hShowAtEnd;
 
 HINSTANCE hAppInstance;
 
@@ -81,13 +81,15 @@ BOOL InitInstance(HINSTANCE hInst) {
 	SendMessage(hLineType, CB_ADDSTRING, 0, (LPARAM) "Horizontal");
 	SendMessage(hLineType, CB_ADDSTRING, 0, (LPARAM) "Vertical");
 	
-	hGenerate = CreateWindowEx(0, "BUTTON", "GENERATE", WS_CHILD | WS_VISIBLE, 310, 490, 200, 40, hMainWnd, NULL, hAppInstance, NULL);
+	hGenerate = CreateWindowEx(0, "BUTTON", "GENERATE", WS_CHILD | WS_VISIBLE, 255, 490, 200, 40, hMainWnd, NULL, hAppInstance, NULL);
 	
 	EnableWindow(hNetColor, FALSE);
 	EnableWindow(hNetSpace, FALSE);
 	EnableWindow(hNetCount, FALSE);
 	EnableWindow(hNetWidth, FALSE);
 	EnableWindow(hLineType, FALSE);
+	
+	hShowAtEnd = CreateWindowEx(0, "BUTTON", "Show after creating", WS_CHILD | WS_VISIBLE | BS_CHECKBOX, 495, 490, 150, 40, hMainWnd, NULL, hAppInstance, NULL);
 	
 	
 	
