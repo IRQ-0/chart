@@ -5,7 +5,9 @@
 
 #define EXIT return DefWindowProc(hWnd, msg, wParam, lParam);
 
-extern HWND hMainWnd, hInputFilename, hOutputFilename, hWidth, hHeight, hChartBackground, hChartColor, hChartType, hBarCount, hBarSpace, hBarWidth, hNetType, hNetColor, hNetCount, hNetSpace, hNetWidth, hLineType, hGenerate;
+#define CHART_APP_NAME "..\\main.exe"
+
+extern HWND hMainWnd, hInputFilename, hOutputFilename, hWidth, hHeight, hChartBackground, hChartColor, hChartType, hBarCount, hBarSpace, hBarWidth, hNetType, hNetColor, hNetCount, hNetSpace, hNetWidth, hLineType, hGenerate, hShowAtEnd;
 extern HINSTANCE hAppInstance;
 
 HDC kon;
@@ -42,6 +44,9 @@ char netColor[SMALL_BUFFER_SIZE];
 	
 // Only if netType == Lines
 char lineType[SMALL_BUFFER_SIZE];
+
+// Show after creating
+int showAfter;
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch(msg) {
@@ -197,7 +202,82 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	        		EXIT;
 				}
 			}
+			
+			char commandBuffer[LARGE_BUFFER_SIZE];
+			char commandNetBuffer[LARGE_BUFFER_SIZE];
+			
+			// chart <filename in> <filename out> <width> <height> <background> <chart type> [options] <chart color> [dividion nets] [options] [division net color]
+			if (strcmp(chartType, "Bar") == 0) {
+				sprintf(commandBuffer, "%s %s %s %d %d %s %s %d %d %d %s",
+									   CHART_APP_NAME,
+									   inputFile,
+									   outputFile,
+									   width,
+									   height,
+									   chartBackColor,
+									   chartType,
+									   barCount,
+									   barSpace,
+									   barWidth,
+									   chartColor);
+			} else {
+				sprintf(commandBuffer, "%s %s %s %d %d %s %s %s",
+									   CHART_APP_NAME,
+									   inputFile,
+									   outputFile,
+									   width,
+									   height,
+									   chartBackColor,
+									   chartType,
+									   chartColor);
+			}
+			
+			if (strcmp(netType, "None") != 0) {
+				if (strcmp(netType, "Lines") == 0) {
+					sprintf(commandNetBuffer, " %s %d %d %d %s %s",
+											  netType,
+											  netCount,
+											  netSpace,
+											  netWidth,
+											  lineType,
+											  netColor);
+					
+				} else {
+					sprintf(commandNetBuffer, " %s %d %d %d %s",
+											  netType,
+											  netCount,
+											  netSpace,
+											  netWidth,
+											  netColor);
+				}
+				
+				strcat(commandBuffer, commandNetBuffer);
+			}
+			
+        	if (system(commandBuffer) != 0) {
+        		MessageBox(hMainWnd, "Error while creating chart", WND_TITLE, MB_ICONERROR);
+        		EXIT;
+        		
+			} else {
+				if (showAfter) {
+					sprintf(commandBuffer, "start %s", outputFile);
+					
+					if (system(commandBuffer) != 0) {
+						MessageBox(hMainWnd, "Error while opening chart", WND_TITLE, MB_ICONERROR);
+						EXIT;
+					}
+				}
+			}
         	
+		} else if (lParam == hShowAtEnd) {
+			if (showAfter == 0) {
+				SendMessage(hShowAtEnd, BM_SETCHECK, BST_CHECKED, 0);
+				showAfter = 1;
+			} else {
+				SendMessage(hShowAtEnd, BM_SETCHECK, BST_UNCHECKED, 0);
+				showAfter = 0;
+			}
+			
 		}
         
 		break;
