@@ -93,6 +93,7 @@ int getFileSize(int width, int height, int bits) {
 }
 
 unsigned char* allocatePixelsMap(headerInfo info) {
+	//return (unsigned char*) malloc(((info.width + (info.width % 16))  * (info.height + (info.height % 16))) * (BITS_PER_PIXEL / 8));
 	return (unsigned char*) malloc((info.width * info.height) * (BITS_PER_PIXEL / 8));
 }
 

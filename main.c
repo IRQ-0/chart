@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 	headerInfo header;
 
 	if (argc < 8) {
-		puts("usage: chart <filename in> <filename out> <width> <height> <background> <chart type> [options] <chart color> [dividion nets] [options] [division net color]");
+		puts("usage: chart <filename in> <filename out> <width> <height> <background> <chart type> [options] <chart color> [division nets] [options] [division net color]");
 		puts("\nAvailable backgrounds:\n - black \n - green \n - red \n - blue \n - white");
 		puts("\n\nAvailable charts:\n - flow (no options needed) \n - dot (no options needed) \n - bar <bar count> <bar space> <bar width>");
 		puts("\nAvailable chart colors:\n - black \n - green \n - red \n - blue \n - white");
@@ -161,8 +161,7 @@ int main(int argc, char** argv) {
 	}
 
 	valueOffset++;
-
-	printf("argc: %d  valueOffset: %d\n", argc, valueOffset);
+	
 	if (argc != valueOffset) {
 		
 
